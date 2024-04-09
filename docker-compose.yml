@@ -1,0 +1,51 @@
+version: "3"
+
+services:
+  psql_keycloak:
+    container_name: postgres_keycloak
+    image: postgres
+    environment:
+      POSTGRES_DB: ${KC_DB_URL}
+      POSTGRES_USER: ${KC_DB_USERNAME}
+      POSTGRES_PASSWORD: ${KC_DB_PASSWORD}
+      PGDATA: /data/postgres
+    volumes:
+      - db:/data/postgres
+    networks:
+      - keycloak_network
+    # TODO: Remove exposed port in prod
+    ports:
+      - "54321:5432"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  keycloak:
+    container_name: keycloak
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - ./.env
+    ports:
+      - "8090:8080"
+    networks:
+      - keycloak_network
+    depends_on:
+      - psql_keycloak
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  keycloak_network:
+    driver: bridge
+
+volumes:
+  db:
