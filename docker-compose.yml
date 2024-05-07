@@ -1,11 +1,9 @@
-version: "3"
-
 services:
   psql_keycloak:
     container_name: postgres_keycloak
     image: postgres
     environment:
-      POSTGRES_DB: ${KC_DB_URL}
+      POSTGRES_DB: keycloakdb
       POSTGRES_USER: ${KC_DB_USERNAME}
       POSTGRES_PASSWORD: ${KC_DB_PASSWORD}
       PGDATA: /data/postgres
